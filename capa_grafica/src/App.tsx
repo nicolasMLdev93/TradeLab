@@ -4,6 +4,8 @@ import Start from "./pages/start";
 import { useNavigate } from "react-router-dom";
 import Login from "./pages/login";
 import Register from "./pages/register";
+import ProtectedRoute from "./components/protected_route";
+import NotFound from "./pages/not_found";
 
 function App() {
   const navigate = useNavigate();
@@ -24,22 +26,14 @@ function App() {
       />
       <Route
         path="/login"
-        element={
-          <Login
-            onBack={() => navigate("/")}
-            onRegister={onRegister}
-          />
-        }
+        element={<Login onBack={() => navigate("/")} onRegister={onRegister} />}
       />
       <Route
         path="/register"
-        element={
-          <Register
-            onBack={() => navigate("/")}
-            onLogin={onLogin}
-          />
-        }
+        element={<Register onBack={() => navigate("/")} onLogin={onLogin} />}
       />
+      <Route element={<ProtectedRoute />}></Route>
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }
