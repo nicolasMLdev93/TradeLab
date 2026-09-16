@@ -1,10 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authorize = void 0;
-/**
- * Middleware de autorización por roles.
- * Uso: router.post('/', authenticate, authorize('admin'), handler)
- */
 const authorize = (...allowedRoles) => (req, res, next) => {
     if (!req.user) {
         return res.status(401).json({

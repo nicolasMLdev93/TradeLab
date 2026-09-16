@@ -1,19 +1,49 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import type { AxiosError } from "axios";
 import Logo from "../images/app_logo.png";
+import { login } from "../api/authApi";
 
 interface LoginProps {
   onBack: () => void;
   onRegister: () => void;
+  onSuccess?: () => void;
 }
 
-export default function Login({ onBack, onRegister }: LoginProps) {
+interface ApiError {
+  ok: boolean;
+  message: string;
+  errors?: { field: string; message: string }[];
+}
+
+export default function Login({ onBack, onRegister, onSuccess }: LoginProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    const payload = { email, password };
+
+    try {
+      await login(payload);
+      onSuccess?.();
+    } catch (err) {
+      const axiosErr = err as AxiosError<ApiError>;
+
+      const message =
+        axiosErr.response?.data?.message ??
+        "No se pudo iniciar sesión. Verifica tus datos e intenta de nuevo.";
+
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -56,8 +86,10 @@ export default function Login({ onBack, onRegister }: LoginProps) {
               <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-green-400/60 to-transparent" />
 
               <button
+                type="button"
                 onClick={onBack}
-                className="absolute left-6 top-6 text-sm text-slate-500 transition-colors hover:text-green-300"
+                disabled={loading}
+                className="absolute left-6 top-6 text-sm text-slate-500 transition-colors hover:text-green-300 disabled:opacity-40"
               >
                 ← Volver
               </button>
@@ -85,17 +117,24 @@ export default function Login({ onBack, onRegister }: LoginProps) {
               <form
                 onSubmit={handleSubmit}
                 className="mt-8 flex flex-col gap-4"
+                noValidate
               >
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-medium tracking-wide text-slate-400">
+                  <label
+                    htmlFor="login-email"
+                    className="text-xs font-medium tracking-wide text-slate-400"
+                  >
                     Correo electrónico
                   </label>
                   <input
+                    id="login-email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="tu@email.com"
                     required
+                    autoComplete="email"
+                    disabled={loading}
                     className="
                       h-12
                       rounded-xl
@@ -109,6 +148,7 @@ export default function Login({ onBack, onRegister }: LoginProps) {
                       outline-none
                       transition-all
                       duration-200
+                      disabled:opacity-50
 
                       focus:border-green-400/60
                       focus:bg-green-400/[0.04]
@@ -118,16 +158,22 @@ export default function Login({ onBack, onRegister }: LoginProps) {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-medium tracking-wide text-slate-400">
+                  <label
+                    htmlFor="login-password"
+                    className="text-xs font-medium tracking-wide text-slate-400"
+                  >
                     Contraseña
                   </label>
                   <div className="relative">
                     <input
+                      id="login-password"
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
                       required
+                      autoComplete="current-password"
+                      disabled={loading}
                       className="
                         h-12
                         w-full
@@ -143,6 +189,7 @@ export default function Login({ onBack, onRegister }: LoginProps) {
                         outline-none
                         transition-all
                         duration-200
+                        disabled:opacity-50
 
                         focus:border-green-400/60
                         focus:bg-green-400/[0.04]
@@ -152,8 +199,14 @@ export default function Login({ onBack, onRegister }: LoginProps) {
                     <button
                       type="button"
                       onClick={() => setShowPassword((v) => !v)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 transition-colors hover:text-green-300"
+                      disabled={loading}
                       tabIndex={-1}
+                      aria-label={
+                        showPassword
+                          ? "Ocultar contraseña"
+                          : "Mostrar contraseña"
+                      }
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 transition-colors hover:text-green-300 disabled:opacity-40"
                     >
                       {showPassword ? (
                         <FiEyeOff size={18} />
@@ -164,11 +217,49 @@ export default function Login({ onBack, onRegister }: LoginProps) {
                   </div>
                 </div>
 
+                {error && (
+                  <div
+                    role="alert"
+                    className="
+                      flex
+                      items-start
+                      gap-3
+                      rounded-xl
+                      border
+                      border-red-500/30
+                      bg-red-500/10
+                      px-4
+                      py-3
+                      text-sm
+                      text-red-300
+                    "
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      className="mt-0.5 h-4 w-4 flex-shrink-0"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v4.5a.75.75 0 0 0 1.5 0V9Zm0 6.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <span className="leading-relaxed">{error}</span>
+                  </div>
+                )}
+
                 <button
                   type="submit"
+                  disabled={loading}
                   className="
                     mt-2
+                    flex
                     h-12
+                    items-center
+                    justify-center
+                    gap-2
                     rounded-xl
                     bg-green-400
                     text-sm
@@ -176,6 +267,8 @@ export default function Login({ onBack, onRegister }: LoginProps) {
                     text-black
                     transition-all
                     duration-300
+                    disabled:cursor-not-allowed
+                    disabled:opacity-60
 
                     hover:bg-green-300
                     hover:shadow-[0_0_30px_rgba(34,197,94,0.5)]
@@ -183,15 +276,24 @@ export default function Login({ onBack, onRegister }: LoginProps) {
                     active:scale-[0.98]
                   "
                 >
-                  Ingresar
+                  {loading ? (
+                    <>
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-black/30 border-t-black" />
+                      Ingresando...
+                    </>
+                  ) : (
+                    "Ingresar"
+                  )}
                 </button>
               </form>
 
               <p className="mt-6 text-center text-sm text-slate-500">
                 ¿No tienes cuenta?{" "}
                 <button
+                  type="button"
                   onClick={onRegister}
-                  className="font-semibold text-green-300 transition-colors hover:text-green-200"
+                  disabled={loading}
+                  className="font-semibold text-green-300 transition-colors hover:text-green-200 disabled:opacity-40"
                 >
                   Regístrate
                 </button>

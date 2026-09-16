@@ -2,10 +2,6 @@ import { type Request, type Response, type NextFunction } from 'express';
 
 export type Role = 'user' | 'admin';
 
-/**
- * Middleware de autorización por roles.
- * Uso: router.post('/', authenticate, authorize('admin'), handler)
- */
 export const authorize = (...allowedRoles: Role[]) =>
   (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
