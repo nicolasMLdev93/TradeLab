@@ -1,59 +1,93 @@
 import {
-  Table, Column, Model, DataType,
-  PrimaryKey, AutoIncrement, AllowNull, ForeignKey,
+  Table,
+  Column,
+  Model,
+  DataType,
+  PrimaryKey,
+  AutoIncrement,
+  AllowNull,
+  Default,
+  ForeignKey,
   BelongsTo,
+  CreatedAt,
+  UpdatedAt,
 } from 'sequelize-typescript';
+import type {
+  CreationOptional,
+  InferAttributes,
+  InferCreationAttributes,
+  NonAttribute,
+} from 'sequelize';
 import { User } from './user.model';
-import { Currency } from './currency.model';
+import { Wallet } from './wallet.model';
 
-@Table({ tableName: 'transactions', underscored: true })
-export class Transaction extends Model {
+export type TransactionType =
+  | 'buy'
+  | 'sell'
+  | 'deposit'
+  | 'withdrawal'
+  | 'transfer_in'
+  | 'transfer_out';
+
+export type TransactionStatus = 'pending' | 'completed' | 'failed' | 'cancelled';
+
+@Table({
+  tableName: 'transactions',
+  modelName: 'Transaction',
+  underscored: true,
+  timestamps: true,
+})
+export class Transaction extends Model<
+  InferAttributes<Transaction>,
+  InferCreationAttributes<Transaction>
+> {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)
-  declare id: number;
+  declare id: CreationOptional<number>;
 
   @ForeignKey(() => User)
   @AllowNull(false)
   @Column(DataType.INTEGER)
   declare userId: number;
 
-  @ForeignKey(() => Currency)
+  @ForeignKey(() => Wallet)
   @AllowNull(false)
   @Column(DataType.INTEGER)
-  declare fromCurrencyId: number;
-
-  @ForeignKey(() => Currency)
-  @AllowNull(false)
-  @Column(DataType.INTEGER)
-  declare toCurrencyId: number;
+  declare walletId: number;
 
   @AllowNull(false)
-  @Column(DataType.DECIMAL(20, 8))
-  declare fromAmount: string;
+  @Column(DataType.ENUM('buy', 'sell', 'deposit', 'withdrawal', 'transfer_in', 'transfer_out'))
+  declare type: TransactionType;
 
   @AllowNull(false)
   @Column(DataType.DECIMAL(20, 8))
-  declare toAmount: string;
+  declare amount: string;
 
-  @AllowNull(false)
+  @AllowNull(true)
   @Column(DataType.DECIMAL(20, 8))
-  declare rate: string;
+  declare price: CreationOptional<string | null>;
 
+  @Default('pending')
   @AllowNull(false)
-  @Column(DataType.ENUM('buy', 'sell', 'swap'))
-  declare type: 'buy' | 'sell' | 'swap';
+  @Column(DataType.ENUM('pending', 'completed', 'failed', 'cancelled'))
+  declare status: CreationOptional<TransactionStatus>;
 
-  @AllowNull(false)
-  @Column(DataType.ENUM('pending', 'completed', 'failed'))
-  declare status: 'pending' | 'completed' | 'failed';
+  @AllowNull(true)
+  @Column(DataType.STRING(255))
+  declare note: CreationOptional<string | null>;
+
+  @CreatedAt
+  @Column(DataType.DATE)
+  declare createdAt: CreationOptional<Date>;
+
+  @UpdatedAt
+  @Column(DataType.DATE)
+  declare updatedAt: CreationOptional<Date>;
 
   @BelongsTo(() => User)
-  declare user: User;
+  declare user: NonAttribute<User>;
 
-  @BelongsTo(() => Currency, 'fromCurrencyId')
-  declare fromCurrency: Currency;
-
-  @BelongsTo(() => Currency, 'toCurrencyId')
-  declare toCurrency: Currency;
+  @BelongsTo(() => Wallet)
+  declare wallet: NonAttribute<Wallet>;
 }

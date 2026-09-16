@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Transaction = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
 const user_model_1 = require("./user.model");
-const currency_model_1 = require("./currency.model");
+const wallet_model_1 = require("./wallet.model");
 let Transaction = class Transaction extends sequelize_typescript_1.Model {
 };
 exports.Transaction = Transaction;
@@ -20,7 +20,7 @@ __decorate([
     sequelize_typescript_1.PrimaryKey,
     sequelize_typescript_1.AutoIncrement,
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
-    __metadata("design:type", Number)
+    __metadata("design:type", Object)
 ], Transaction.prototype, "id", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => user_model_1.User),
@@ -29,54 +29,60 @@ __decorate([
     __metadata("design:type", Number)
 ], Transaction.prototype, "userId", void 0);
 __decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => currency_model_1.Currency),
+    (0, sequelize_typescript_1.ForeignKey)(() => wallet_model_1.Wallet),
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
     __metadata("design:type", Number)
-], Transaction.prototype, "fromCurrencyId", void 0);
-__decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => currency_model_1.Currency),
-    (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
-    __metadata("design:type", Number)
-], Transaction.prototype, "toCurrencyId", void 0);
+], Transaction.prototype, "walletId", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.DECIMAL(20, 8)),
-    __metadata("design:type", String)
-], Transaction.prototype, "fromAmount", void 0);
-__decorate([
-    (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.DECIMAL(20, 8)),
-    __metadata("design:type", String)
-], Transaction.prototype, "toAmount", void 0);
-__decorate([
-    (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.DECIMAL(20, 8)),
-    __metadata("design:type", String)
-], Transaction.prototype, "rate", void 0);
-__decorate([
-    (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.ENUM('buy', 'sell', 'swap')),
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.ENUM('buy', 'sell', 'deposit', 'withdrawal', 'transfer_in', 'transfer_out')),
     __metadata("design:type", String)
 ], Transaction.prototype, "type", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.ENUM('pending', 'completed', 'failed')),
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.DECIMAL(20, 8)),
     __metadata("design:type", String)
+], Transaction.prototype, "amount", void 0);
+__decorate([
+    (0, sequelize_typescript_1.AllowNull)(true),
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.DECIMAL(20, 8)),
+    __metadata("design:type", Object)
+], Transaction.prototype, "price", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Default)('pending'),
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.ENUM('pending', 'completed', 'failed', 'cancelled')),
+    __metadata("design:type", Object)
 ], Transaction.prototype, "status", void 0);
 __decorate([
+    (0, sequelize_typescript_1.AllowNull)(true),
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.STRING(255)),
+    __metadata("design:type", Object)
+], Transaction.prototype, "note", void 0);
+__decorate([
+    sequelize_typescript_1.CreatedAt,
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.DATE),
+    __metadata("design:type", Object)
+], Transaction.prototype, "createdAt", void 0);
+__decorate([
+    sequelize_typescript_1.UpdatedAt,
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.DATE),
+    __metadata("design:type", Object)
+], Transaction.prototype, "updatedAt", void 0);
+__decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => user_model_1.User),
-    __metadata("design:type", user_model_1.User)
+    __metadata("design:type", Object)
 ], Transaction.prototype, "user", void 0);
 __decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => currency_model_1.Currency, 'fromCurrencyId'),
-    __metadata("design:type", currency_model_1.Currency)
-], Transaction.prototype, "fromCurrency", void 0);
-__decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => currency_model_1.Currency, 'toCurrencyId'),
-    __metadata("design:type", currency_model_1.Currency)
-], Transaction.prototype, "toCurrency", void 0);
+    (0, sequelize_typescript_1.BelongsTo)(() => wallet_model_1.Wallet),
+    __metadata("design:type", Object)
+], Transaction.prototype, "wallet", void 0);
 exports.Transaction = Transaction = __decorate([
-    (0, sequelize_typescript_1.Table)({ tableName: 'transactions', underscored: true })
+    (0, sequelize_typescript_1.Table)({
+        tableName: 'transactions',
+        modelName: 'Transaction',
+        underscored: true,
+        timestamps: true,
+    })
 ], Transaction);

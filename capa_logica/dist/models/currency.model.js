@@ -19,7 +19,7 @@ __decorate([
     sequelize_typescript_1.PrimaryKey,
     sequelize_typescript_1.AutoIncrement,
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
-    __metadata("design:type", Number)
+    __metadata("design:type", Object)
 ], Currency.prototype, "id", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
@@ -43,9 +43,24 @@ __decorate([
     __metadata("design:type", Number)
 ], Currency.prototype, "decimals", void 0);
 __decorate([
+    sequelize_typescript_1.CreatedAt,
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.DATE),
+    __metadata("design:type", Object)
+], Currency.prototype, "createdAt", void 0);
+__decorate([
+    sequelize_typescript_1.UpdatedAt,
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.DATE),
+    __metadata("design:type", Object)
+], Currency.prototype, "updatedAt", void 0);
+__decorate([
     (0, sequelize_typescript_1.HasMany)(() => wallet_model_1.Wallet),
-    __metadata("design:type", Array)
+    __metadata("design:type", Object)
 ], Currency.prototype, "wallets", void 0);
 exports.Currency = Currency = __decorate([
-    (0, sequelize_typescript_1.Table)({ tableName: 'currencies', underscored: true })
+    (0, sequelize_typescript_1.Table)({
+        tableName: 'currencies',
+        modelName: 'Currency',
+        underscored: true,
+        timestamps: true,
+    })
 ], Currency);

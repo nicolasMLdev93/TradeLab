@@ -20,7 +20,7 @@ __decorate([
     sequelize_typescript_1.PrimaryKey,
     sequelize_typescript_1.AutoIncrement,
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
-    __metadata("design:type", Number)
+    __metadata("design:type", Object)
 ], Wallet.prototype, "id", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => user_model_1.User),
@@ -35,22 +35,39 @@ __decorate([
     __metadata("design:type", Number)
 ], Wallet.prototype, "currencyId", void 0);
 __decorate([
+    (0, sequelize_typescript_1.Default)(0),
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.DECIMAL(20, 8)),
-    __metadata("design:type", String)
+    __metadata("design:type", Object)
 ], Wallet.prototype, "balance", void 0);
 __decorate([
+    (0, sequelize_typescript_1.AllowNull)(true),
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.STRING(255)),
+    __metadata("design:type", Object)
+], Wallet.prototype, "address", void 0);
+__decorate([
+    sequelize_typescript_1.CreatedAt,
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.DATE),
+    __metadata("design:type", Object)
+], Wallet.prototype, "createdAt", void 0);
+__decorate([
+    sequelize_typescript_1.UpdatedAt,
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.DATE),
+    __metadata("design:type", Object)
+], Wallet.prototype, "updatedAt", void 0);
+__decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => user_model_1.User),
-    __metadata("design:type", user_model_1.User)
+    __metadata("design:type", Object)
 ], Wallet.prototype, "user", void 0);
 __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => currency_model_1.Currency),
-    __metadata("design:type", currency_model_1.Currency)
+    __metadata("design:type", Object)
 ], Wallet.prototype, "currency", void 0);
 exports.Wallet = Wallet = __decorate([
     (0, sequelize_typescript_1.Table)({
         tableName: 'wallets',
+        modelName: 'Wallet',
         underscored: true,
-        indexes: [{ unique: true, fields: ['user_id', 'currency_id'] }],
+        timestamps: true,
     })
 ], Wallet);

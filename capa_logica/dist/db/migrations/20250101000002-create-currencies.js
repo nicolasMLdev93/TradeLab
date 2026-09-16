@@ -15,13 +15,39 @@ const sequelize_1 = require("sequelize");
 function up(queryInterface) {
     return __awaiter(this, void 0, void 0, function* () {
         yield queryInterface.createTable('currencies', {
-            id: { type: sequelize_1.DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-            symbol: { type: sequelize_1.DataTypes.STRING(10), allowNull: false, unique: true },
-            name: { type: sequelize_1.DataTypes.STRING(50), allowNull: false },
-            type: { type: sequelize_1.DataTypes.ENUM('fiat', 'crypto'), allowNull: false },
-            decimals: { type: sequelize_1.DataTypes.TINYINT, allowNull: false },
-            created_at: { type: sequelize_1.DataTypes.DATE, allowNull: false, defaultValue: sequelize_1.DataTypes.NOW },
-            updated_at: { type: sequelize_1.DataTypes.DATE, allowNull: false, defaultValue: sequelize_1.DataTypes.NOW },
+            id: {
+                type: sequelize_1.DataTypes.INTEGER,
+                autoIncrement: true,
+                primaryKey: true,
+                allowNull: false,
+            },
+            symbol: {
+                type: sequelize_1.DataTypes.STRING(10),
+                allowNull: false,
+                unique: true,
+            },
+            name: {
+                type: sequelize_1.DataTypes.STRING(50),
+                allowNull: false,
+            },
+            type: {
+                type: sequelize_1.DataTypes.ENUM('fiat', 'crypto'),
+                allowNull: false,
+            },
+            decimals: {
+                type: sequelize_1.DataTypes.TINYINT,
+                allowNull: false,
+            },
+            created_at: {
+                type: sequelize_1.DataTypes.DATE,
+                allowNull: false,
+                defaultValue: sequelize_1.DataTypes.NOW,
+            },
+            updated_at: {
+                type: sequelize_1.DataTypes.DATE,
+                allowNull: false,
+                defaultValue: sequelize_1.DataTypes.NOW,
+            },
         });
     });
 }

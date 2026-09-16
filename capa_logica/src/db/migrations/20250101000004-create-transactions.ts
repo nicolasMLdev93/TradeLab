@@ -2,7 +2,13 @@ import { QueryInterface, DataTypes } from 'sequelize';
 
 export async function up(queryInterface: QueryInterface) {
   await queryInterface.createTable('transactions', {
-    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+      allowNull: false,
+    },
+
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -10,35 +16,77 @@ export async function up(queryInterface: QueryInterface) {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
     },
-    from_currency_id: {
+
+    wallet_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: { model: 'currencies', key: 'id' },
+      references: { model: 'wallets', key: 'id' },
       onUpdate: 'CASCADE',
-      onDelete: 'RESTRICT',
+      onDelete: 'CASCADE',
     },
-    to_currency_id: {
-      type: DataTypes.INTEGER,
+
+    type: {
+      type: DataTypes.ENUM(
+        'buy',
+        'sell',
+        'deposit',
+        'withdrawal',
+        'transfer_in',
+        'transfer_out'
+      ),
       allowNull: false,
-      references: { model: 'currencies', key: 'id' },
-      onUpdate: 'CASCADE',
-      onDelete: 'RESTRICT',
     },
-    from_amount: { type: DataTypes.DECIMAL(20, 8), allowNull: false },
-    to_amount:   { type: DataTypes.DECIMAL(20, 8), allowNull: false },
-    rate:        { type: DataTypes.DECIMAL(20, 8), allowNull: false },
-    type:   { type: DataTypes.ENUM('buy', 'sell', 'swap'), allowNull: false },
+
+    amount: {
+      type: DataTypes.DECIMAL(20, 8),
+      allowNull: false,
+    },
+
+    price: {
+      type: DataTypes.DECIMAL(20, 8),
+      allowNull: true,
+    },
+
     status: {
-      type: DataTypes.ENUM('pending', 'completed', 'failed'),
+      type: DataTypes.ENUM('pending', 'completed', 'failed', 'cancelled'),
       allowNull: false,
-      defaultValue: 'completed',
+      defaultValue: 'pending',
     },
-    created_at: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
-    updated_at: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
+
+    note: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+
+    created_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+
+    updated_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
   });
 
-  await queryInterface.addIndex('transactions', ['user_id']);
-  await queryInterface.addIndex('transactions', ['created_at']);
+  // Índices para queries frecuentes
+  await queryInterface.addIndex('transactions', ['user_id'], {
+    name: 'transactions_user_id_idx',
+  });
+
+  await queryInterface.addIndex('transactions', ['wallet_id'], {
+    name: 'transactions_wallet_id_idx',
+  });
+
+  await queryInterface.addIndex('transactions', ['status'], {
+    name: 'transactions_status_idx',
+  });
+
+  await queryInterface.addIndex('transactions', ['created_at'], {
+    name: 'transactions_created_at_idx',
+  });
 }
 
 export async function down(queryInterface: QueryInterface) {

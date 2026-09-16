@@ -15,7 +15,12 @@ const sequelize_1 = require("sequelize");
 function up(queryInterface) {
     return __awaiter(this, void 0, void 0, function* () {
         yield queryInterface.createTable('transactions', {
-            id: { type: sequelize_1.DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+            id: {
+                type: sequelize_1.DataTypes.INTEGER,
+                autoIncrement: true,
+                primaryKey: true,
+                allowNull: false,
+            },
             user_id: {
                 type: sequelize_1.DataTypes.INTEGER,
                 allowNull: false,
@@ -23,34 +28,58 @@ function up(queryInterface) {
                 onUpdate: 'CASCADE',
                 onDelete: 'CASCADE',
             },
-            from_currency_id: {
+            wallet_id: {
                 type: sequelize_1.DataTypes.INTEGER,
                 allowNull: false,
-                references: { model: 'currencies', key: 'id' },
+                references: { model: 'wallets', key: 'id' },
                 onUpdate: 'CASCADE',
-                onDelete: 'RESTRICT',
+                onDelete: 'CASCADE',
             },
-            to_currency_id: {
-                type: sequelize_1.DataTypes.INTEGER,
+            type: {
+                type: sequelize_1.DataTypes.ENUM('buy', 'sell', 'deposit', 'withdrawal', 'transfer_in', 'transfer_out'),
                 allowNull: false,
-                references: { model: 'currencies', key: 'id' },
-                onUpdate: 'CASCADE',
-                onDelete: 'RESTRICT',
             },
-            from_amount: { type: sequelize_1.DataTypes.DECIMAL(20, 8), allowNull: false },
-            to_amount: { type: sequelize_1.DataTypes.DECIMAL(20, 8), allowNull: false },
-            rate: { type: sequelize_1.DataTypes.DECIMAL(20, 8), allowNull: false },
-            type: { type: sequelize_1.DataTypes.ENUM('buy', 'sell', 'swap'), allowNull: false },
+            amount: {
+                type: sequelize_1.DataTypes.DECIMAL(20, 8),
+                allowNull: false,
+            },
+            price: {
+                type: sequelize_1.DataTypes.DECIMAL(20, 8),
+                allowNull: true,
+            },
             status: {
-                type: sequelize_1.DataTypes.ENUM('pending', 'completed', 'failed'),
+                type: sequelize_1.DataTypes.ENUM('pending', 'completed', 'failed', 'cancelled'),
                 allowNull: false,
-                defaultValue: 'completed',
+                defaultValue: 'pending',
             },
-            created_at: { type: sequelize_1.DataTypes.DATE, allowNull: false, defaultValue: sequelize_1.DataTypes.NOW },
-            updated_at: { type: sequelize_1.DataTypes.DATE, allowNull: false, defaultValue: sequelize_1.DataTypes.NOW },
+            note: {
+                type: sequelize_1.DataTypes.STRING(255),
+                allowNull: true,
+            },
+            created_at: {
+                type: sequelize_1.DataTypes.DATE,
+                allowNull: false,
+                defaultValue: sequelize_1.DataTypes.NOW,
+            },
+            updated_at: {
+                type: sequelize_1.DataTypes.DATE,
+                allowNull: false,
+                defaultValue: sequelize_1.DataTypes.NOW,
+            },
         });
-        yield queryInterface.addIndex('transactions', ['user_id']);
-        yield queryInterface.addIndex('transactions', ['created_at']);
+        // Índices para queries frecuentes
+        yield queryInterface.addIndex('transactions', ['user_id'], {
+            name: 'transactions_user_id_idx',
+        });
+        yield queryInterface.addIndex('transactions', ['wallet_id'], {
+            name: 'transactions_wallet_id_idx',
+        });
+        yield queryInterface.addIndex('transactions', ['status'], {
+            name: 'transactions_status_idx',
+        });
+        yield queryInterface.addIndex('transactions', ['created_at'], {
+            name: 'transactions_created_at_idx',
+        });
     });
 }
 function down(queryInterface) {

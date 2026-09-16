@@ -15,7 +15,12 @@ const sequelize_1 = require("sequelize");
 function up(queryInterface) {
     return __awaiter(this, void 0, void 0, function* () {
         yield queryInterface.createTable('wallets', {
-            id: { type: sequelize_1.DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+            id: {
+                type: sequelize_1.DataTypes.INTEGER,
+                autoIncrement: true,
+                primaryKey: true,
+                allowNull: false,
+            },
             user_id: {
                 type: sequelize_1.DataTypes.INTEGER,
                 allowNull: false,
@@ -35,12 +40,27 @@ function up(queryInterface) {
                 allowNull: false,
                 defaultValue: 0,
             },
-            created_at: { type: sequelize_1.DataTypes.DATE, allowNull: false, defaultValue: sequelize_1.DataTypes.NOW },
-            updated_at: { type: sequelize_1.DataTypes.DATE, allowNull: false, defaultValue: sequelize_1.DataTypes.NOW },
+            address: {
+                type: sequelize_1.DataTypes.STRING(255),
+                allowNull: true,
+            },
+            created_at: {
+                type: sequelize_1.DataTypes.DATE,
+                allowNull: false,
+                defaultValue: sequelize_1.DataTypes.NOW,
+            },
+            updated_at: {
+                type: sequelize_1.DataTypes.DATE,
+                allowNull: false,
+                defaultValue: sequelize_1.DataTypes.NOW,
+            },
         });
         yield queryInterface.addIndex('wallets', ['user_id', 'currency_id'], {
             unique: true,
             name: 'wallets_user_currency_unique',
+        });
+        yield queryInterface.addIndex('wallets', ['user_id'], {
+            name: 'wallets_user_id_idx',
         });
     });
 }

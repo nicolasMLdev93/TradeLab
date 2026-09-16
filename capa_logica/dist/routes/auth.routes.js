@@ -7,33 +7,152 @@ const validate_middleware_1 = require("../middlewares/validate.middleware");
 const auth_middleware_1 = require("../middlewares/auth.middleware");
 const router = (0, express_1.Router)();
 /**
- * @route   POST /api/auth/register
- * @desc    Registrar un usuario nuevo
- * @access  Público
+ * @swagger
+ * /api/auth/register:
+ *   post:
+ *     summary: Registrar un usuario nuevo
+ *     tags: [Auth]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [username, email, password, confirmPassword]
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 minLength: 3
+ *                 maxLength: 50
+ *                 example: juanperez
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: juan@example.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 minLength: 8
+ *                 example: Password123
+ *               confirmPassword:
+ *                 type: string
+ *                 format: password
+ *                 example: Password123
+ *     responses:
+ *       201:
+ *         description: Usuario registrado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/AuthResponse' }
+ *       400:
+ *         $ref: '#/components/responses/ValidationError'
+ *       409:
+ *         description: El email ya está registrado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  */
 router.post('/register', auth_validators_1.registerValidators, validate_middleware_1.validate, auth_controller_1.register);
 /**
- * @route   POST /api/auth/login
- * @desc    Iniciar sesión
- * @access  Público
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Iniciar sesión
+ *     tags: [Auth]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: juan@example.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: Password123
+ *     responses:
+ *       200:
+ *         description: Login exitoso
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/AuthResponse' }
+ *       400:
+ *         $ref: '#/components/responses/ValidationError'
+ *       401:
+ *         description: Credenciales inválidas
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  */
 router.post('/login', auth_validators_1.loginValidators, validate_middleware_1.validate, auth_controller_1.login);
 /**
- * @route   POST /api/auth/refresh
- * @desc    Renovar access token con la cookie de refresh
- * @access  Cookie httpOnly
+ * @swagger
+ * /api/auth/refresh:
+ *   post:
+ *     summary: Renovar el access token con la cookie de refresh
+ *     tags: [Auth]
+ *     security: []
+ *     responses:
+ *       200:
+ *         description: Nuevo access token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ok: { type: boolean, example: true }
+ *                 accessToken: { type: string }
+ *       401:
+ *         description: Refresh token inválido o ausente
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  */
 router.post('/refresh', auth_controller_1.refresh);
 /**
- * @route   POST /api/auth/logout
- * @desc    Cerrar sesión (borra la cookie)
- * @access  Público
+ * @swagger
+ * /api/auth/logout:
+ *   post:
+ *     summary: Cerrar sesión (borra la cookie de refresh)
+ *     tags: [Auth]
+ *     security: []
+ *     responses:
+ *       200:
+ *         description: Sesión cerrada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ok: { type: boolean, example: true }
+ *                 message: { type: string, example: Sesión cerrada }
  */
 router.post('/logout', auth_controller_1.logout);
 /**
- * @route   GET /api/auth/me
- * @desc    Usuario autenticado actual
- * @access  Privado
+ * @swagger
+ * /api/auth/me:
+ *   get:
+ *     summary: Obtener el usuario autenticado actual
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Usuario autenticado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ok: { type: boolean, example: true }
+ *                 user: { $ref: '#/components/schemas/User' }
+ *       401:
+ *         $ref: '#/components/responses/Unauthorized'
  */
 router.get('/me', auth_middleware_1.authenticate, auth_controller_1.me);
 exports.default = router;
