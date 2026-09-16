@@ -20,6 +20,11 @@ export async function up(queryInterface: QueryInterface) {
       type: DataTypes.STRING(255),
       allowNull: false,
     },
+    role: {
+      type: DataTypes.ENUM('user', 'admin'),
+      allowNull: false,
+      defaultValue: 'user',
+    },
     created_at: {
       type: DataTypes.DATE,
       allowNull: false,

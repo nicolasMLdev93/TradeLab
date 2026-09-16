@@ -1,34 +1,37 @@
-import "dotenv/config";
-import app from "./index";
-import { sequelize } from "./config/database";
-
-const PORT = Number(process.env.PORT) || 3000;
+import 'reflect-metadata';
+import { createApp } from './index';
+import { connectDatabase, sequelize } from './config/database';
+import { env } from './config/env';
 
 async function bootstrap() {
   try {
-    await sequelize.authenticate();
-    console.log("✅ Conexión a MySQL OK");
+    await connectDatabase();
+    console.log('✅ Conexión a MySQL OK');
 
-    const server = app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
+    const app = createApp();
+
+    const server = app.listen(env.port, () => {
+      console.log(`🚀 Server running on http://localhost:${env.port} [${env.nodeEnv}]`);
     });
 
-    server.on("error", (error) => {
-      console.error("✗ Failed to start server:", error);
+    server.on('error', (error) => {
+      console.error('✗ Failed to start server:', error);
       process.exit(1);
     });
 
-    const shutdown = async (signal: string) => {
+    const shutdown = (signal: string) => {
+      console.log(`\n${signal} recibido, cerrando...`);
       server.close(async () => {
         await sequelize.close();
-        console.log("🔌 DB cerrada. Bye.");
+        console.log('🔌 DB cerrada. Bye.');
         process.exit(0);
       });
     };
 
-    process.on("SIGINT", () => shutdown("SIGINT"));
+    process.on('SIGINT', () => shutdown('SIGINT'));
+    process.on('SIGTERM', () => shutdown('SIGTERM'));
   } catch (error) {
-    console.error("💥 Error al arrancar:", error);
+    console.error('💥 Error al arrancar:', error);
     process.exit(1);
   }
 }

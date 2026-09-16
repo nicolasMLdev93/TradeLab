@@ -20,7 +20,7 @@ __decorate([
     sequelize_typescript_1.PrimaryKey,
     sequelize_typescript_1.AutoIncrement,
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.INTEGER),
-    __metadata("design:type", Number)
+    __metadata("design:type", Object)
 ], User.prototype, "id", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
@@ -39,13 +39,34 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "passwordHash", void 0);
 __decorate([
+    (0, sequelize_typescript_1.Default)('user'),
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.ENUM('user', 'admin')),
+    __metadata("design:type", Object)
+], User.prototype, "role", void 0);
+__decorate([
+    sequelize_typescript_1.CreatedAt,
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.DATE),
+    __metadata("design:type", Object)
+], User.prototype, "createdAt", void 0);
+__decorate([
+    sequelize_typescript_1.UpdatedAt,
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.DATE),
+    __metadata("design:type", Object)
+], User.prototype, "updatedAt", void 0);
+__decorate([
     (0, sequelize_typescript_1.HasMany)(() => wallet_model_1.Wallet),
-    __metadata("design:type", Array)
+    __metadata("design:type", Object)
 ], User.prototype, "wallets", void 0);
 __decorate([
     (0, sequelize_typescript_1.HasMany)(() => transaction_model_1.Transaction),
-    __metadata("design:type", Array)
+    __metadata("design:type", Object)
 ], User.prototype, "transactions", void 0);
 exports.User = User = __decorate([
-    (0, sequelize_typescript_1.Table)({ tableName: 'users', underscored: true })
+    (0, sequelize_typescript_1.Table)({
+        tableName: 'users',
+        modelName: 'User',
+        underscored: true,
+        timestamps: true,
+    })
 ], User);

@@ -1,27 +1,39 @@
 import 'reflect-metadata';
-import 'dotenv/config';
 import { Sequelize } from 'sequelize-typescript';
+import { env } from './env';
 import { User } from '../models/user.model';
 import { Currency } from '../models/currency.model';
 import { Wallet } from '../models/wallet.model';
 import { Transaction } from '../models/transaction.model';
 
-const {
-  DB_HOST, DB_PORT = '3306', DB_NAME, DB_USER, DB_PASSWORD,
-  NODE_ENV = 'development',
-} = process.env;
-
-for (const [key, value] of Object.entries({ DB_HOST, DB_NAME, DB_USER, DB_PASSWORD })) {
-  if (!value) throw new Error(`❌ Falta la variable de entorno: ${key}`);
-}
-
 export const sequelize = new Sequelize({
   dialect: 'mysql',
-  host: DB_HOST,
-  port: Number(DB_PORT),
-  database: DB_NAME,
-  username: DB_USER,
-  password: DB_PASSWORD,
-  logging: NODE_ENV === 'development' ? console.log : false,
+  host: env.db.host,
+  port: env.db.port,
+  database: env.db.name,
+  username: env.db.user,
+  password: env.db.password,
+  logging: env.isDev ? console.log : false,
   models: [User, Currency, Wallet, Transaction],
+  define: {
+    timestamps: true,
+    underscored: true,
+    paranoid: false,
+  },
+  pool: {
+    max: 10,
+    min: 0,
+    acquire: 30000,
+    idle: 10000,
+  },
 });
+
+export const connectDatabase = async (): Promise<void> => {
+  try {
+    await sequelize.authenticate();
+    console.log('✅ Conexión a MySQL OK');
+  } catch (error) {
+    console.error('❌ Error al conectar la base de datos:', error);
+    process.exit(1);
+  }
+};

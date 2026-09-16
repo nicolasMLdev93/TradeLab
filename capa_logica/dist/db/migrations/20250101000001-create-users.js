@@ -33,6 +33,11 @@ function up(queryInterface) {
                 type: sequelize_1.DataTypes.STRING(255),
                 allowNull: false,
             },
+            role: {
+                type: sequelize_1.DataTypes.ENUM('user', 'admin'),
+                allowNull: false,
+                defaultValue: 'user',
+            },
             created_at: {
                 type: sequelize_1.DataTypes.DATE,
                 allowNull: false,
