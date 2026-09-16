@@ -1,20 +1,20 @@
-import { type Request, type Response, type NextFunction } from 'express';
-import { env } from '../config/env';
+import { type Request, type Response, type NextFunction } from "express";
+import { env } from "../config/env";
 import {
   registerUser,
   loginUser,
   refreshUserTokens,
   getCurrentUser,
-} from '../services/auth.service';
+} from "../services/auth.service";
 
-const REFRESH_COOKIE = 'refreshToken';
+const REFRESH_COOKIE = "refreshToken";
 const REFRESH_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
 
 const setRefreshCookie = (res: Response, token: string) => {
   res.cookie(REFRESH_COOKIE, token, {
     httpOnly: true,
     secure: env.isProd,
-    sameSite: 'strict',
+    sameSite: "strict",
     maxAge: REFRESH_MAX_AGE,
   });
 };
@@ -22,7 +22,7 @@ const setRefreshCookie = (res: Response, token: string) => {
 export const register = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { username, email, password } = req.body;
@@ -35,11 +35,7 @@ export const register = async (
 
     setRefreshCookie(res, refreshToken);
 
-    res.status(201).json({
-      ok: true,
-      user,
-      accessToken,
-    });
+    res.status(201).json({ ok: true, user, accessToken });
   } catch (err) {
     next(err);
   }
@@ -48,7 +44,7 @@ export const register = async (
 export const login = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const { email, password } = req.body;
@@ -73,7 +69,7 @@ export const login = async (
 export const refresh = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   try {
     const token = req.cookies?.[REFRESH_COOKIE] as string | undefined;
@@ -81,7 +77,7 @@ export const refresh = async (
     if (!token) {
       return res.status(401).json({
         ok: false,
-        message: 'Refresh token no proporcionado',
+        message: "Refresh token no proporcionado",
       });
     }
 
@@ -94,7 +90,7 @@ export const refresh = async (
 
 export const logout = (_req: Request, res: Response) => {
   res.clearCookie(REFRESH_COOKIE);
-  res.json({ ok: true, message: 'Sesión cerrada' });
+  res.json({ ok: true, message: "Sesión cerrada" });
 };
 
 export const me = async (req: Request, res: Response, next: NextFunction) => {

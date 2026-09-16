@@ -1,10 +1,13 @@
 import { body } from 'express-validator';
 
 export const registerValidators = [
-  body('name')
+  body('username')
     .trim()
-    .notEmpty().withMessage('El nombre es obligatorio')
-    .isLength({ min: 2, max: 50 }).withMessage('El nombre debe tener entre 2 y 50 caracteres'),
+    .notEmpty().withMessage('El nombre de usuario es obligatorio')
+    .isLength({ min: 3, max: 50 })
+    .withMessage('El usuario debe tener entre 3 y 50 caracteres')
+    .matches(/^[a-zA-Z0-9_]+$/)
+    .withMessage('Solo letras, números y guion bajo'),
 
   body('email')
     .trim()

@@ -3,10 +3,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.loginValidators = exports.registerValidators = void 0;
 const express_validator_1 = require("express-validator");
 exports.registerValidators = [
-    (0, express_validator_1.body)('name')
+    (0, express_validator_1.body)('username')
         .trim()
-        .notEmpty().withMessage('El nombre es obligatorio')
-        .isLength({ min: 2, max: 50 }).withMessage('El nombre debe tener entre 2 y 50 caracteres'),
+        .notEmpty().withMessage('El nombre de usuario es obligatorio')
+        .isLength({ min: 3, max: 50 })
+        .withMessage('El usuario debe tener entre 3 y 50 caracteres')
+        .matches(/^[a-zA-Z0-9_]+$/)
+        .withMessage('Solo letras, números y guion bajo'),
     (0, express_validator_1.body)('email')
         .trim()
         .notEmpty().withMessage('El email es obligatorio')
