@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router } from "express";
 import {
   create,
   list,
@@ -6,16 +6,17 @@ import {
   getBySymbol,
   update,
   remove,
-} from '../controllers/currency.controller';
+  listWithPrices,
+} from "../controllers/currency.controller";
 import {
   createCurrencyValidators,
   updateCurrencyValidators,
   currencyIdParamValidator,
   listCurrenciesValidators,
-} from '../validators/currency.validators';
-import { validate } from '../middlewares/validate.middleware';
-import { authenticate } from '../middlewares/auth.middleware';
-import { authorize } from '../middlewares/role.middleware';
+} from "../validators/currency.validators";
+import { validate } from "../middlewares/validate.middleware";
+import { authenticate } from "../middlewares/auth.middleware";
+import { authorize } from "../middlewares/role.middleware";
 
 const router = Router();
 
@@ -48,7 +49,38 @@ const router = Router();
  *       400:
  *         $ref: '#/components/responses/ValidationError'
  */
-router.get('/', listCurrenciesValidators, validate, list);
+router.get("/", listCurrenciesValidators, validate, list);
+
+/**
+ * @swagger
+ * /api/currencies/prices:
+ *   get:
+ *     summary: Catálogo de monedas con precios en vivo (USD)
+ *     tags: [Currencies]
+ *     security: []
+ *     responses:
+ *       200:
+ *         description: Lista de monedas con precio USD y cambio 24h
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ok: { type: boolean, example: true }
+ *                 currencies:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       symbol: { type: string, example: BTC }
+ *                       name: { type: string, example: Bitcoin }
+ *                       type: { type: string, enum: [fiat, crypto] }
+ *                       decimals: { type: integer, example: 8 }
+ *                       usd: { type: number, example: 45230.12 }
+ *                       change24h: { type: number, example: 1.45 }
+ *                 lastUpdated: { type: string, format: date-time }
+ */
+router.get("/prices", listWithPrices);
 
 /**
  * @swagger
@@ -76,7 +108,7 @@ router.get('/', listCurrenciesValidators, validate, list);
  *       404:
  *         $ref: '#/components/responses/NotFound'
  */
-router.get('/symbol/:symbol', getBySymbol);
+router.get("/symbol/:symbol", getBySymbol);
 
 /**
  * @swagger
@@ -103,7 +135,7 @@ router.get('/symbol/:symbol', getBySymbol);
  *       404:
  *         $ref: '#/components/responses/NotFound'
  */
-router.get('/:id', currencyIdParamValidator, validate, getOne);
+router.get("/:id", currencyIdParamValidator, validate, getOne);
 
 /**
  * @swagger
@@ -161,12 +193,12 @@ router.get('/:id', currencyIdParamValidator, validate, getOne);
  *             schema: { $ref: '#/components/schemas/Error' }
  */
 router.post(
-  '/',
+  "/",
   authenticate,
-  authorize('admin'),
+  authorize("admin"),
   createCurrencyValidators,
   validate,
-  create
+  create,
 );
 
 /**
@@ -217,13 +249,13 @@ router.post(
  *         $ref: '#/components/responses/NotFound'
  */
 router.patch(
-  '/:id',
+  "/:id",
   authenticate,
-  authorize('admin'),
+  authorize("admin"),
   currencyIdParamValidator,
   updateCurrencyValidators,
   validate,
-  update
+  update,
 );
 
 /**
@@ -260,12 +292,12 @@ router.patch(
  *             schema: { $ref: '#/components/schemas/Error' }
  */
 router.delete(
-  '/:id',
+  "/:id",
   authenticate,
-  authorize('admin'),
+  authorize("admin"),
   currencyIdParamValidator,
   validate,
-  remove
+  remove,
 );
 
 export default router;

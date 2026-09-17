@@ -1,17 +1,21 @@
-import { type Request, type Response, type NextFunction } from 'express';
+import { type Request, type Response, type NextFunction } from "express";
 import {
   createTransaction,
   listUserTransactions,
   getTransactionById,
   updateTransactionStatus,
   deleteTransaction,
-} from '../services/transaction.service';
+} from "../services/transaction.service";
 import type {
   TransactionStatus,
   TransactionType,
-} from '../models/transaction.model';
+} from "../models/transaction.model";
 
-export const create = async (req: Request, res: Response, next: NextFunction) => {
+export const create = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const userId = req.user!.id;
     const { walletId, type, amount, price, note } = req.body;
@@ -53,7 +57,11 @@ export const list = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export const getOne = async (req: Request, res: Response, next: NextFunction) => {
+export const getOne = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const userId = req.user!.id;
     const id = Number(req.params.id);
@@ -65,7 +73,11 @@ export const getOne = async (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
-export const updateStatus = async (req: Request, res: Response, next: NextFunction) => {
+export const updateStatus = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const userId = req.user!.id;
     const id = Number(req.params.id);
@@ -78,14 +90,47 @@ export const updateStatus = async (req: Request, res: Response, next: NextFuncti
   }
 };
 
-export const remove = async (req: Request, res: Response, next: NextFunction) => {
+export const remove = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const userId = req.user!.id;
     const id = Number(req.params.id);
 
     await deleteTransaction(id, userId);
 
-    res.json({ ok: true, message: 'Transacción eliminada' });
+    res.json({ ok: true, message: "Transacción eliminada" });
+  } catch (err) {
+    next(err);
+  }
+};
+
+import { transferBetweenWallets } from "../services/transaction.service";
+
+export const transfer = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const userId = req.user!.id;
+    const { fromWalletId, toWalletId, amount, note } = req.body;
+
+    const result = await transferBetweenWallets({
+      userId,
+      fromWalletId: Number(fromWalletId),
+      toWalletId: Number(toWalletId),
+      amount,
+      note,
+    });
+
+    res.status(201).json({
+      ok: true,
+      message: "Transferencia realizada",
+      transfer: result,
+    });
   } catch (err) {
     next(err);
   }

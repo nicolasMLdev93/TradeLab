@@ -36,7 +36,37 @@ const router = (0, express_1.Router)();
  *       400:
  *         $ref: '#/components/responses/ValidationError'
  */
-router.get('/', currency_validators_1.listCurrenciesValidators, validate_middleware_1.validate, currency_controller_1.list);
+router.get("/", currency_validators_1.listCurrenciesValidators, validate_middleware_1.validate, currency_controller_1.list);
+/**
+ * @swagger
+ * /api/currencies/prices:
+ *   get:
+ *     summary: Catálogo de monedas con precios en vivo (USD)
+ *     tags: [Currencies]
+ *     security: []
+ *     responses:
+ *       200:
+ *         description: Lista de monedas con precio USD y cambio 24h
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ok: { type: boolean, example: true }
+ *                 currencies:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       symbol: { type: string, example: BTC }
+ *                       name: { type: string, example: Bitcoin }
+ *                       type: { type: string, enum: [fiat, crypto] }
+ *                       decimals: { type: integer, example: 8 }
+ *                       usd: { type: number, example: 45230.12 }
+ *                       change24h: { type: number, example: 1.45 }
+ *                 lastUpdated: { type: string, format: date-time }
+ */
+router.get("/prices", currency_controller_1.listWithPrices);
 /**
  * @swagger
  * /api/currencies/symbol/{symbol}:
@@ -63,7 +93,7 @@ router.get('/', currency_validators_1.listCurrenciesValidators, validate_middlew
  *       404:
  *         $ref: '#/components/responses/NotFound'
  */
-router.get('/symbol/:symbol', currency_controller_1.getBySymbol);
+router.get("/symbol/:symbol", currency_controller_1.getBySymbol);
 /**
  * @swagger
  * /api/currencies/{id}:
@@ -89,7 +119,7 @@ router.get('/symbol/:symbol', currency_controller_1.getBySymbol);
  *       404:
  *         $ref: '#/components/responses/NotFound'
  */
-router.get('/:id', currency_validators_1.currencyIdParamValidator, validate_middleware_1.validate, currency_controller_1.getOne);
+router.get("/:id", currency_validators_1.currencyIdParamValidator, validate_middleware_1.validate, currency_controller_1.getOne);
 /**
  * @swagger
  * /api/currencies:
@@ -145,7 +175,7 @@ router.get('/:id', currency_validators_1.currencyIdParamValidator, validate_midd
  *           application/json:
  *             schema: { $ref: '#/components/schemas/Error' }
  */
-router.post('/', auth_middleware_1.authenticate, (0, role_middleware_1.authorize)('admin'), currency_validators_1.createCurrencyValidators, validate_middleware_1.validate, currency_controller_1.create);
+router.post("/", auth_middleware_1.authenticate, (0, role_middleware_1.authorize)("admin"), currency_validators_1.createCurrencyValidators, validate_middleware_1.validate, currency_controller_1.create);
 /**
  * @swagger
  * /api/currencies/{id}:
@@ -193,7 +223,7 @@ router.post('/', auth_middleware_1.authenticate, (0, role_middleware_1.authorize
  *       404:
  *         $ref: '#/components/responses/NotFound'
  */
-router.patch('/:id', auth_middleware_1.authenticate, (0, role_middleware_1.authorize)('admin'), currency_validators_1.currencyIdParamValidator, currency_validators_1.updateCurrencyValidators, validate_middleware_1.validate, currency_controller_1.update);
+router.patch("/:id", auth_middleware_1.authenticate, (0, role_middleware_1.authorize)("admin"), currency_validators_1.currencyIdParamValidator, currency_validators_1.updateCurrencyValidators, validate_middleware_1.validate, currency_controller_1.update);
 /**
  * @swagger
  * /api/currencies/{id}:
@@ -227,5 +257,5 @@ router.patch('/:id', auth_middleware_1.authenticate, (0, role_middleware_1.autho
  *           application/json:
  *             schema: { $ref: '#/components/schemas/Error' }
  */
-router.delete('/:id', auth_middleware_1.authenticate, (0, role_middleware_1.authorize)('admin'), currency_validators_1.currencyIdParamValidator, validate_middleware_1.validate, currency_controller_1.remove);
+router.delete("/:id", auth_middleware_1.authenticate, (0, role_middleware_1.authorize)("admin"), currency_validators_1.currencyIdParamValidator, validate_middleware_1.validate, currency_controller_1.remove);
 exports.default = router;

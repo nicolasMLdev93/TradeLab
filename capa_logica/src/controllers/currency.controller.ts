@@ -8,6 +8,8 @@ import {
   deleteCurrency,
 } from '../services/currency.service';
 import type { CurrencyType } from '../models/currency.model';
+import { getPricesBySymbols } from '../services/crypto.service';
+import { Currency } from '../models/currency.model';
 
 export const create = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -82,6 +84,61 @@ export const remove = async (req: Request, res: Response, next: NextFunction) =>
     const id = Number(req.params.id);
     await deleteCurrency(id);
     res.json({ ok: true, message: 'Moneda eliminada' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const listWithPrices = async (
+  _req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const currencies = await Currency.findAll({
+      order: [['symbol', 'ASC']],
+    });
+
+    const cryptoSymbols = currencies
+      .filter((c) => c.type === 'crypto')
+      .map((c) => c.symbol);
+
+    const pricesList = await getPricesBySymbols(cryptoSymbols);
+    const pricesBySymbol = new Map(pricesList.map((p) => [p.symbol, p]));
+
+    const result = currencies.map((c) => {
+      const symbol = c.symbol.toUpperCase();
+
+      if (c.type === 'fiat') {
+        return {
+          id: c.id,           
+          symbol,
+          name: c.name,
+          type: c.type,
+          decimals: c.decimals,
+          usd: 1,
+          change24h: 0,
+        };
+      }
+
+      const price = pricesBySymbol.get(symbol);
+
+      return {
+        id: c.id,             
+        symbol,
+        name: c.name,
+        type: c.type,
+        decimals: c.decimals,
+        usd: price?.usd ?? 0,
+        change24h: price?.usd_24h_change ?? 0,
+      };
+    });
+
+    res.json({
+      ok: true,
+      currencies: result,
+      lastUpdated: new Date().toISOString(),
+    });
   } catch (err) {
     next(err);
   }

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.listTransactionsValidators = exports.transactionIdParamValidator = exports.updateStatusValidators = exports.createTransactionValidators = void 0;
+exports.transferValidators = exports.listTransactionsValidators = exports.transactionIdParamValidator = exports.updateStatusValidators = exports.createTransactionValidators = void 0;
 const express_validator_1 = require("express-validator");
 const TYPES = ['buy', 'sell', 'deposit', 'withdrawal', 'transfer_in', 'transfer_out'];
 const STATUSES = ['pending', 'completed', 'failed', 'cancelled'];
@@ -50,4 +50,20 @@ exports.listTransactionsValidators = [
     (0, express_validator_1.query)('offset')
         .optional()
         .isInt({ min: 0 }).withMessage('offset debe ser >= 0'),
+];
+exports.transferValidators = [
+    (0, express_validator_1.body)('fromWalletId')
+        .notEmpty().withMessage('fromWalletId es obligatorio')
+        .isInt({ min: 1 }).withMessage('fromWalletId inválido'),
+    (0, express_validator_1.body)('toWalletId')
+        .notEmpty().withMessage('toWalletId es obligatorio')
+        .isInt({ min: 1 }).withMessage('toWalletId inválido'),
+    (0, express_validator_1.body)('amount')
+        .notEmpty().withMessage('amount es obligatorio')
+        .isDecimal().withMessage('amount debe ser un número decimal')
+        .custom((v) => Number(v) > 0).withMessage('amount debe ser mayor a 0'),
+    (0, express_validator_1.body)('note')
+        .optional({ nullable: true })
+        .isString().withMessage('note debe ser string')
+        .isLength({ max: 255 }).withMessage('note demasiado largo'),
 ];

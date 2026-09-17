@@ -111,6 +111,29 @@ router.get('/', transaction_validators_1.listTransactionsValidators, validate_mi
 router.post('/', transaction_validators_1.createTransactionValidators, validate_middleware_1.validate, transaction_controller_1.create);
 /**
  * @swagger
+ * /api/transactions/transfer:
+ *   post:
+ *     summary: Transferir entre dos wallets propias (misma moneda)
+ *     tags: [Transactions]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [fromWalletId, toWalletId, amount]
+ *             properties:
+ *               fromWalletId: { type: integer, example: 1 }
+ *               toWalletId: { type: integer, example: 2 }
+ *               amount: { type: string, example: "0.5" }
+ *               note: { type: string, example: "Mover fondos" }
+ *     responses:
+ *       201:
+ *         description: Transferencia realizada
+ */
+router.post('/transfer', transaction_validators_1.transferValidators, validate_middleware_1.validate, transaction_controller_1.transfer);
+/**
+ * @swagger
  * /api/transactions/{id}:
  *   get:
  *     summary: Obtener una transacción por ID

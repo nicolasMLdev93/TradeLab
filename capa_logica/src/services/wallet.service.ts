@@ -1,3 +1,4 @@
+import { Currency } from '../models/currency.model';
 import { Wallet } from '../models/wallet.model';
 import { HttpError } from '../utils/httpError';
 
@@ -9,11 +10,9 @@ export const createWallet = async (input: {
 }) => {
   const { userId, currencyId, balance, address } = input;
 
-  const existing = await Wallet.findOne({
-    where: { userId, currencyId },
-  });
-  if (existing) {
-    throw new HttpError(409, 'Ya tienes una wallet de esa moneda');
+  const currency = await Currency.findByPk(currencyId);
+  if (!currency) {
+    throw new HttpError(404, 'Moneda no encontrada');
   }
 
   const wallet = await Wallet.create({
@@ -23,12 +22,17 @@ export const createWallet = async (input: {
     address: address ?? null,
   });
 
-  return wallet;
+  const withCurrency = await Wallet.findByPk(wallet.id, {
+    include: [{ model: Currency, as: 'currency' }],
+  });
+
+  return withCurrency!;
 };
 
 export const listUserWallets = async (userId: number) => {
   return Wallet.findAll({
     where: { userId },
+    include: [{ model: Currency, as: 'currency' }],
     order: [['createdAt', 'DESC']],
   });
 };

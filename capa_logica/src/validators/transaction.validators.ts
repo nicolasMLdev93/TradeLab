@@ -61,3 +61,23 @@ export const listTransactionsValidators = [
     .optional()
     .isInt({ min: 0 }).withMessage('offset debe ser >= 0'),
 ];
+
+export const transferValidators = [
+  body('fromWalletId')
+    .notEmpty().withMessage('fromWalletId es obligatorio')
+    .isInt({ min: 1 }).withMessage('fromWalletId inválido'),
+
+  body('toWalletId')
+    .notEmpty().withMessage('toWalletId es obligatorio')
+    .isInt({ min: 1 }).withMessage('toWalletId inválido'),
+
+  body('amount')
+    .notEmpty().withMessage('amount es obligatorio')
+    .isDecimal().withMessage('amount debe ser un número decimal')
+    .custom((v) => Number(v) > 0).withMessage('amount debe ser mayor a 0'),
+
+  body('note')
+    .optional({ nullable: true })
+    .isString().withMessage('note debe ser string')
+    .isLength({ max: 255 }).withMessage('note demasiado largo'),
+];

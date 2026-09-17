@@ -48,11 +48,6 @@ export async function up(queryInterface: QueryInterface) {
       defaultValue: DataTypes.NOW,
     },
   });
-  await queryInterface.addIndex('wallets', ['user_id', 'currency_id'], {
-    unique: true,
-    name: 'wallets_user_currency_unique',
-  });
-
 
   await queryInterface.addIndex('wallets', ['user_id'], {
     name: 'wallets_user_id_idx',

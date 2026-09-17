@@ -3,6 +3,7 @@ import { FiEye, FiEyeOff, FiCheck, FiX } from "react-icons/fi";
 import type { AxiosError } from "axios";
 import Logo from "../images/app_logo.png";
 import { register } from "../api/authApi";
+import { useNavigate } from "react-router-dom";
 
 interface RegisterProps {
   onBack: () => void;
@@ -37,6 +38,8 @@ export default function Register({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+
+  const navigate = useNavigate();
 
   const rules = {
     minLength: password.length >= 8,
@@ -73,6 +76,7 @@ export default function Register({
     try {
       await register(payload);
       onSuccess?.();
+      navigate("/home");
     } catch (err) {
       const axiosErr = err as AxiosError<ApiError>;
       const response = axiosErr.response?.data;

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.remove = exports.updateStatus = exports.getOne = exports.list = exports.create = void 0;
+exports.transfer = exports.remove = exports.updateStatus = exports.getOne = exports.list = exports.create = void 0;
 const transaction_service_1 = require("../services/transaction.service");
 const create = async (req, res, next) => {
     try {
@@ -69,10 +69,33 @@ const remove = async (req, res, next) => {
         const userId = req.user.id;
         const id = Number(req.params.id);
         await (0, transaction_service_1.deleteTransaction)(id, userId);
-        res.json({ ok: true, message: 'Transacción eliminada' });
+        res.json({ ok: true, message: "Transacción eliminada" });
     }
     catch (err) {
         next(err);
     }
 };
 exports.remove = remove;
+const transaction_service_2 = require("../services/transaction.service");
+const transfer = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+        const { fromWalletId, toWalletId, amount, note } = req.body;
+        const result = await (0, transaction_service_2.transferBetweenWallets)({
+            userId,
+            fromWalletId: Number(fromWalletId),
+            toWalletId: Number(toWalletId),
+            amount,
+            note,
+        });
+        res.status(201).json({
+            ok: true,
+            message: "Transferencia realizada",
+            transfer: result,
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+};
+exports.transfer = transfer;

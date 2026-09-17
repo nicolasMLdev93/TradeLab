@@ -1,15 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteWallet = exports.listUserWallets = exports.createWallet = void 0;
+const currency_model_1 = require("../models/currency.model");
 const wallet_model_1 = require("../models/wallet.model");
 const httpError_1 = require("../utils/httpError");
 const createWallet = async (input) => {
     const { userId, currencyId, balance, address } = input;
-    const existing = await wallet_model_1.Wallet.findOne({
-        where: { userId, currencyId },
-    });
-    if (existing) {
-        throw new httpError_1.HttpError(409, 'Ya tienes una wallet de esa moneda');
+    const currency = await currency_model_1.Currency.findByPk(currencyId);
+    if (!currency) {
+        throw new httpError_1.HttpError(404, 'Moneda no encontrada');
     }
     const wallet = await wallet_model_1.Wallet.create({
         userId,
@@ -17,12 +16,16 @@ const createWallet = async (input) => {
         balance: balance ?? '0',
         address: address ?? null,
     });
-    return wallet;
+    const withCurrency = await wallet_model_1.Wallet.findByPk(wallet.id, {
+        include: [{ model: currency_model_1.Currency, as: 'currency' }],
+    });
+    return withCurrency;
 };
 exports.createWallet = createWallet;
 const listUserWallets = async (userId) => {
     return wallet_model_1.Wallet.findAll({
         where: { userId },
+        include: [{ model: currency_model_1.Currency, as: 'currency' }],
         order: [['createdAt', 'DESC']],
     });
 };

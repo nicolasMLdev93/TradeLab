@@ -5,12 +5,14 @@ import {
   getOne,
   updateStatus,
   remove,
+  transfer,
 } from '../controllers/transaction.controller';
 import {
   createTransactionValidators,
   updateStatusValidators,
   transactionIdParamValidator,
   listTransactionsValidators,
+  transferValidators,
 } from '../validators/transaction.validators';
 import { validate } from '../middlewares/validate.middleware';
 import { authenticate } from '../middlewares/auth.middleware';
@@ -122,6 +124,31 @@ router.get('/', listTransactionsValidators, validate, list);
  *         $ref: '#/components/responses/NotFound'
  */
 router.post('/', createTransactionValidators, validate, create);
+
+/**
+ * @swagger
+ * /api/transactions/transfer:
+ *   post:
+ *     summary: Transferir entre dos wallets propias (misma moneda)
+ *     tags: [Transactions]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [fromWalletId, toWalletId, amount]
+ *             properties:
+ *               fromWalletId: { type: integer, example: 1 }
+ *               toWalletId: { type: integer, example: 2 }
+ *               amount: { type: string, example: "0.5" }
+ *               note: { type: string, example: "Mover fondos" }
+ *     responses:
+ *       201:
+ *         description: Transferencia realizada
+ */
+router.post('/transfer', transferValidators, validate, transfer);
+
 
 /**
  * @swagger

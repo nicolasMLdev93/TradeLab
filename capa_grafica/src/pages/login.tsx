@@ -3,6 +3,7 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 import type { AxiosError } from "axios";
 import Logo from "../images/app_logo.png";
 import { login } from "../api/authApi";
+import { useNavigate } from "react-router-dom";
 
 interface LoginProps {
   onBack: () => void;
@@ -23,6 +24,8 @@ export default function Login({ onBack, onRegister, onSuccess }: LoginProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const navigate = useNavigate()
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -33,6 +36,7 @@ export default function Login({ onBack, onRegister, onSuccess }: LoginProps) {
     try {
       await login(payload);
       onSuccess?.();
+      navigate('/home')
     } catch (err) {
       const axiosErr = err as AxiosError<ApiError>;
 
